@@ -11,8 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 import static org.hamcrest.Matchers.*;
@@ -65,7 +65,7 @@ class ContactControllerTest {
     void should_call_getContactById_when_GET_contacts_with_id_is_called() throws Exception {
         //GIVEN
         Contact contact = new Contact(1L, "John", "Smith", null, null);
-        Mockito.when(contactService.getContactById(1L)).thenReturn(contact);
+        Mockito.when(contactService.getContactById(1L)).thenReturn(Optional.of(contact));
 
         //WHEN THEN
         mockMvc.perform(get(ENDPOINT +"/1"))
@@ -94,9 +94,11 @@ class ContactControllerTest {
     @Test
     void should_call_deleteContact_when_DELETE_contacts_with_id_is_called() throws Exception {
         //GIVEN
-
+        Long id = 1L;
+        Mockito.doNothing().when(contactService).deleteContact(id);
 
         //WHEN THEN
+        mockMvc.perform(delete(ENDPOINT +"/"+id)).andExpect(status().isNoContent()).andReturn();
 
     }
 }

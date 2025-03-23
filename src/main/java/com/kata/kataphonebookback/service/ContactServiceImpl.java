@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactServiceImpl implements ContactService {
@@ -16,12 +17,6 @@ public class ContactServiceImpl implements ContactService {
         this.contactRepository = contactRepository;
     }
 
-
-//    @Override
-//    @Transactional
-//    public Contact addNewContact(ContactEntity contact) {
-//        return convertEntityToContact(contactRepository.save(contact));
-//    }
 
     @Override
     @Transactional
@@ -36,6 +31,11 @@ public class ContactServiceImpl implements ContactService {
         contactRepository.deleteById(id);
     }
 
+//    @Override
+//    public Contact updateContact(Contact contact) {
+//        return null;
+//    }
+
     @Override
     public List<Contact> getAllContacts() {
         List<ContactEntity> contacts = contactRepository.findAll();
@@ -44,9 +44,17 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact getContactById(Long id) {
-        return convertEntityToContact(contactRepository.getReferenceById(id));
+    public Optional<Contact> getContactById(Long id) {
+        Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
+        return contactEntityOptional.map(this::convertEntityToContact);
     }
+
+//    @Override
+//    public Contact getContactById(Long id) {
+//    public Contact getContactById(Long id) {
+//        return convertEntityToContact(contactRepository.getReferenceById(id));
+//    }
+
 
     private Contact convertEntityToContact(ContactEntity contactEntity) {
         return new Contact(

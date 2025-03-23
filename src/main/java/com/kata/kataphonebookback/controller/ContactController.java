@@ -1,6 +1,5 @@
 package com.kata.kataphonebookback.controller;
 
-import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.service.Contact;
 import com.kata.kataphonebookback.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -31,7 +31,7 @@ public class ContactController {
             @ApiResponse(responseCode = "200", description = "Contacts récupérés",
                     content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Contact.class)
                     )}),
-            @ApiResponse(responseCode = "400", description = "Echec de la récuperation",
+            @ApiResponse(responseCode = "404", description = "Echec de la récuperation",
                     content = @Content)
     })
     public ResponseEntity<List<Contact>> getAllContact() {
@@ -44,10 +44,12 @@ public class ContactController {
             @ApiResponse(responseCode = "200", description = "Contact récupéré",
                 content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Contact.class)
             )}),
-            @ApiResponse(responseCode = "400", description = "Echec de la récuperation", content = @Content )
+            @ApiResponse(responseCode = "404", description = "Echec de la récuperation, la ressource n'existe pas", content = @Content )
     })
     public ResponseEntity<Contact> getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
-        return new ResponseEntity<>(contactService.getContactById(contactId), HttpStatus.OK);
+        Optional<Contact> contactOpt = contactService.getContactById(contactId);
+        return contactOpt.map(contact -> new ResponseEntity<>(contact, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
     }
 
     @PostMapping("/")

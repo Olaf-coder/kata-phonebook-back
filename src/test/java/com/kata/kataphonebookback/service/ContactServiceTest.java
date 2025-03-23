@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -98,16 +99,33 @@ class ContactServiceTest {
 
         ContactEntity existingContactEntity = createExistingContactEntity();
         Contact expectedContact = createExpectedContact();
-        when(contactRepository.getReferenceById(id)).thenReturn(existingContactEntity);
+        when(contactRepository.findById(id)).thenReturn(Optional.of(existingContactEntity));
 
 
         //WHEN
-        Contact actualContact = contactService.getContactById(id);
+        Optional<Contact> actualContact = contactService.getContactById(id);
 
 
         //THEN
-        verify(contactRepository, times(1)).getReferenceById(id);
-        assertThat(actualContact).isEqualTo(expectedContact);
+        verify(contactRepository, times(1)).findById(id);
+        assertThat(actualContact).isNotEmpty().contains(expectedContact);
+    }
+
+    @Test
+    void should_call_getReferenceById_once_with_correct_values_and_return_empty_when_getContactById_is_called_with_non_existing_id() {
+        //GIVEN
+        Long id = 50L;
+
+        when(contactRepository.findById(id)).thenReturn(Optional.empty());
+
+
+        //WHEN
+        Optional<Contact> actualContact = contactService.getContactById(id);
+
+
+        //THEN
+        verify(contactRepository, times(1)).findById(id);
+        assertThat(actualContact).isEmpty();
     }
     //todo invalid parameter => exception
 
@@ -125,7 +143,6 @@ class ContactServiceTest {
         verify(contactRepository, times(1)).findAll();
         assertThat(actualContacts).isEqualTo(expectedContacts);
     }
-    //todo invalid parameter => exception
 
     private List<ContactEntity> createExistingContactEntities()
     {
