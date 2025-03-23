@@ -35,15 +35,14 @@ class ContactServiceTest {
         //GIVEN
         ContactEntity inputContactEntity = createExistingContactEntity();
         inputContactEntity.setId(null);
+        Contact inputContactTranslated = new Contact(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
 
         ContactEntity savedContactEntity = createExistingContactEntity();
         Contact expectedContact = createExpectedContact();
-
         Mockito.when(contactRepository.save(inputContactEntity)).thenReturn(savedContactEntity);
 
-
         //WHEN
-        Contact actualContact = contactService.addNewContact(inputContactEntity);
+        Contact actualContact = contactService.addNewContact(inputContactTranslated);
 
 
         //THEN
@@ -56,13 +55,15 @@ class ContactServiceTest {
     void should_call_save_once_with_correct_values_and_return_saved_contact_when_addNewContact_is_called_with_only_mandatory_data_and_no_id() {
         //GIVEN
         ContactEntity inputContactEntity = createContactEntity(null, "John", "Smith", null, null);
+        Contact inputContactTranslated = new Contact(null, "John", "Smith", null, null);
+
         ContactEntity savedContactEntity = createContactEntity(1L, "John", "Smith", null, null);
         Contact expectedContact = new Contact(1L, "John", "Smith", null, null);
         Mockito.when(contactRepository.save(inputContactEntity)).thenReturn(savedContactEntity);
 
 
         //WHEN
-        Contact actualContact = contactService.addNewContact(inputContactEntity);
+        Contact actualContact = contactService.addNewContact(inputContactTranslated);
 
 
         //THEN
@@ -161,7 +162,6 @@ class ContactServiceTest {
         contactEntity.setPhoneNumber(phoneNumber);
         return contactEntity;
     }
-
 
     private Contact convertEntityToContact(ContactEntity contactEntity) {
         return new Contact(contactEntity.getId(), contactEntity.getFirstName(), contactEntity.getFamilyName(), contactEntity.getPhoneNumber(), contactEntity.getEmail());

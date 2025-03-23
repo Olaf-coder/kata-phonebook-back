@@ -5,7 +5,7 @@ import com.kata.kataphonebookback.domain.model.ContactEntity;
 import java.util.List;
 
 public interface ContactService {
-    Contact addNewContact(ContactEntity contact);
+    Contact addNewContact(Contact contact);
 
     void deleteContact(Long id);
 

@@ -3,6 +3,8 @@ package com.kata.kataphonebookback.domain.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Schema(hidden=true)
 @Entity
 @Table(name="contact")
@@ -67,5 +69,17 @@ public class ContactEntity {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ContactEntity that = (ContactEntity) o;
+        return version == that.version && Objects.equals(id, that.id) && Objects.equals(familyName, that.familyName) && Objects.equals(firstName, that.firstName) && Objects.equals(email, that.email) && Objects.equals(phoneNumber, that.phoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(version, id, familyName, firstName, email, phoneNumber);
     }
 }

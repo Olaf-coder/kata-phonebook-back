@@ -25,8 +25,8 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public Contact addNewContact(ContactEntity contact) {
-        return convertEntityToContact(contactRepository.save(contact));
+    public Contact addNewContact(Contact contact) {
+        return convertEntityToContact(contactRepository.save(convertContactToEntity(contact)));
     }
 
 
@@ -56,6 +56,16 @@ public class ContactServiceImpl implements ContactService {
                 contactEntity.getPhoneNumber(),
                 contactEntity.getEmail()
         );
+    }
+
+    private ContactEntity convertContactToEntity(Contact contact) {
+        ContactEntity contactEntity = new ContactEntity();
+        contactEntity.setId(contact.id());
+        contactEntity.setFirstName(contact.firstName());
+        contactEntity.setFamilyName(contact.familyName());
+        contactEntity.setPhoneNumber(contact.phoneNumber());
+        contactEntity.setEmail(contact.email());
+        return contactEntity;
     }
 
 }
