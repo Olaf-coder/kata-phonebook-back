@@ -1,6 +1,5 @@
 package com.kata.kataphonebookback.domain.model;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
@@ -8,6 +7,11 @@ import jakarta.persistence.*;
 @Entity
 @Table(name="contact")
 public class ContactEntity {
+
+    @Version
+    @Column(name="VERSION")
+    private int version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable = false, unique = true)

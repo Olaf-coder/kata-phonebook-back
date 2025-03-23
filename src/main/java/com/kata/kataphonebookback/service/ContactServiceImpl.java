@@ -21,10 +21,11 @@ public class ContactServiceImpl implements ContactService {
         return convertEntityToContact(contactRepository.save(contact));
     }
 
-    @Override
+
     @Transactional
-    public void deleteContact(ContactEntity contact) {
-        contactRepository.delete(contact);
+    @Override
+    public void deleteContact(Long id) {
+        contactRepository.deleteById(id);
     }
 
     @Override
@@ -48,4 +49,5 @@ public class ContactServiceImpl implements ContactService {
                 contactEntity.getEmail()
         );
     }
+
 }
