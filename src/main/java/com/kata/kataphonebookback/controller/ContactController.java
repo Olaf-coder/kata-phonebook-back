@@ -52,7 +52,7 @@ public class ContactController {
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
-    public ResponseEntity<Contact> addNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactEntity contact) {
+    public ResponseEntity<Contact> createNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactEntity contact) {
         return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
     }
 

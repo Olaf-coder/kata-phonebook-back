@@ -29,7 +29,7 @@ class ContactServiceTest {
         contactService = new ContactServiceImpl(contactRepository);
     }
 
-
+//CREATE
     @Test
     void should_call_save_once_with_correct_values_and_return_saved_contact_when_addNewContact_is_called_with_full_contact_and_no_id() {
         //GIVEN
@@ -72,6 +72,7 @@ class ContactServiceTest {
     }
     //todo methodes en erreur
 
+//DELETE
     @Test
     void should_call_deleteById_once_when_deleteContact_is_called_with_id() {
         //GIVEN
@@ -88,6 +89,7 @@ class ContactServiceTest {
         Assertions.assertThatNoException().isThrownBy(()->contactService.deleteContact(id));
     }
 
+//READ
     @Test
     void should_call_getReferenceById_once_with_correct_values_and_return_existing_contact_when_getContactById_is_called_with_correct_id() {
         //GIVEN
@@ -109,7 +111,7 @@ class ContactServiceTest {
     //todo invalid parameter => exception
 
     @Test
-    void getAllContacts() {
+    void should_call_findAll_once_and_return_existing_contact_when_getAllContacts_is_called_with_correct_id() {
         //GIVEN
         List<ContactEntity> contactEntities = createExistingContactEntities();
         List<Contact> expectedContacts = createExpectedContacts();
