@@ -1,7 +1,10 @@
-package com.kata.kataphonebookback.model;
+package com.kata.kataphonebookback.domain.model;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
+@Schema(hidden=true)
 @Entity
 @Table(name="contact")
 public class ContactEntity {
