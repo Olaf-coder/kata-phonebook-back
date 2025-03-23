@@ -57,7 +57,7 @@ class ContactServiceTest {
         //GIVEN
         ContactEntity inputContactEntity = createContactEntity(null, "John", "Smith", null, null);
         ContactEntity savedContactEntity = createContactEntity(1L, "John", "Smith", null, null);
-        Contact expectedContact = createContact(1L, "John", "Smith", null, null);
+        Contact expectedContact = new Contact(1L, "John", "Smith", null, null);
         Mockito.when(contactRepository.save(inputContactEntity)).thenReturn(savedContactEntity);
 
 
@@ -137,10 +137,10 @@ class ContactServiceTest {
 
     private List<Contact> createExpectedContacts()
     {
-        return List.of(createContact(1L, "John", "Smith", null, null),
-                createContact(2L, "William", "Saurin", "saurinwilliam@mail.com", "060102030405"),
-                createContact(3L, "Sophie", "Saurin", "saurinsophie@mail.com", null),
-                createContact(4L, "Michel", "Palaref", null, null)
+        return List.of(new Contact(1L, "John", "Smith", null, null),
+                new Contact(2L, "William", "Saurin", "saurinwilliam@mail.com", "060102030405"),
+                new Contact(3L, "Sophie", "Saurin", "saurinsophie@mail.com", null),
+                new Contact(4L, "Michel", "Palaref", null, null)
         );
     }
 
@@ -149,10 +149,10 @@ class ContactServiceTest {
     }
 
     private Contact createExpectedContact() {
-        return createContact(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        return new Contact(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
     }
 
-    private ContactEntity createContactEntity(Long id, String firstName, String familyName, String email, String phoneNumber) {
+    private ContactEntity createContactEntity(Long id, String firstName, String familyName, String phoneNumber, String email) {
         ContactEntity contactEntity = new ContactEntity();
         contactEntity.setId(id);
         contactEntity.setFirstName(firstName);
@@ -162,9 +162,6 @@ class ContactServiceTest {
         return contactEntity;
     }
 
-    private Contact createContact(Long id, String firstName, String familyName, String email, String phoneNumber) {
-        return new Contact(id, firstName, familyName, phoneNumber, email);
-    }
 
     private Contact convertEntityToContact(ContactEntity contactEntity) {
         return new Contact(contactEntity.getId(), contactEntity.getFirstName(), contactEntity.getFamilyName(), contactEntity.getPhoneNumber(), contactEntity.getEmail());

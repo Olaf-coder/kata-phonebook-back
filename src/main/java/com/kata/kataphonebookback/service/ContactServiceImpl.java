@@ -2,7 +2,6 @@ package com.kata.kataphonebookback.service;
 
 import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,12 @@ public class ContactServiceImpl implements ContactService {
         this.contactRepository = contactRepository;
     }
 
+
+//    @Override
+//    @Transactional
+//    public Contact addNewContact(ContactEntity contact) {
+//        return convertEntityToContact(contactRepository.save(contact));
+//    }
 
     @Override
     @Transactional
