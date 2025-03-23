@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +34,8 @@ public class ContactController {
             @ApiResponse(responseCode = "400", description = "Echec de la récuperation",
                     content = @Content)
     })
-
-    public List<Contact> getAllContact() {
-        return contactService.getAllContacts();
+    public ResponseEntity<List<Contact>> getAllContact() {
+        return new ResponseEntity<>(contactService.getAllContacts(), HttpStatus.OK);
     }
 
     @GetMapping("/{contactId}")
@@ -45,24 +46,24 @@ public class ContactController {
             )}),
             @ApiResponse(responseCode = "400", description = "Echec de la récuperation", content = @Content )
     })
-    public Contact getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
-        return contactService.getContactById(contactId);
+    public ResponseEntity<Contact> getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
+        return new ResponseEntity<>(contactService.getContactById(contactId), HttpStatus.OK);
     }
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
-    public Contact addNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactEntity contact) {
-        return contactService.addNewContact(contact);
+    public ResponseEntity<Contact> addNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactEntity contact) {
+        return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
     }
 
 
     @DeleteMapping("/{contactId}")
     @Operation(summary= "Suppression d'un contact précis")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact supprimé",
-                    content = @Content),
-            @ApiResponse(responseCode = "400", description = "Echec de la récuperation", content = @Content)
+            @ApiResponse(responseCode = "204", description = "Contact supprimé",
+                    content = @Content)
     })
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void supressionContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
         contactService.deleteContact(contactId);
     }
