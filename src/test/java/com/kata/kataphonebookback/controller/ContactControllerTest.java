@@ -1,8 +1,8 @@
 package com.kata.kataphonebookback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kata.kataphonebookback.Exceptions.InvalidDataException;
-import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
+import com.kata.kataphonebookback.exceptions.InvalidDataException;
+import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.service.Contact;
 import com.kata.kataphonebookback.service.ContactService;
 import com.kata.kataphonebookback.service.ContactServiceImpl;

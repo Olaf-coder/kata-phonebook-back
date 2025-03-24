@@ -1,7 +1,7 @@
 package com.kata.kataphonebookback.service;
 
-import com.kata.kataphonebookback.Exceptions.InvalidDataException;
-import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
+import com.kata.kataphonebookback.exceptions.InvalidDataException;
+import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
 import org.assertj.core.api.Assertions;

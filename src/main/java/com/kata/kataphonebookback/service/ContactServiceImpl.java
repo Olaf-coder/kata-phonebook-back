@@ -1,7 +1,7 @@
 package com.kata.kataphonebookback.service;
 
-import com.kata.kataphonebookback.Exceptions.InvalidDataException;
-import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
+import com.kata.kataphonebookback.exceptions.InvalidDataException;
+import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     @Transactional
     public Contact addNewContact(Contact contact) throws InvalidDataException {
-//        return convertEntityToContact(contactRepository.save(convertContactToEntity(contact)));
         if (ObjectUtils.isEmpty(contact.firstName()) || ObjectUtils.isEmpty(contact.familyName()) || contact.firstName().isBlank() || contact.familyName().isBlank()) {
             throw new InvalidDataException("Contact first name or family name is missing");
         }

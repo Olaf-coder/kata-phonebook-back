@@ -1,4 +1,4 @@
-package com.kata.kataphonebookback.Exceptions;
+package com.kata.kataphonebookback.exceptions;
 
 public class InvalidDataException extends RuntimeException {
     public InvalidDataException(String message) {
