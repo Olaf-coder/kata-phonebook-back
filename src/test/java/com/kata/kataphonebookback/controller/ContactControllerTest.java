@@ -1,5 +1,6 @@
 package com.kata.kataphonebookback.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kata.kataphonebookback.service.Contact;
 import com.kata.kataphonebookback.service.ContactService;
 import com.kata.kataphonebookback.service.ContactServiceImpl;
@@ -27,6 +28,7 @@ class ContactControllerTest {
     private final ContactService contactService = Mockito.mock(ContactServiceImpl.class);
 
     private MockMvc mockMvc;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ContactController(contactService)).build();
@@ -104,28 +106,19 @@ class ContactControllerTest {
                 .andExpect(jsonPath("$.phoneNumber", is(nullValue())))
                 .andExpect(jsonPath("$.email", is(nullValue())))
                 .andReturn();
-
     }
 
     @Test
     void should_call_updateContact_when_PUT_contacts_with_contact_requestbody_is_called() throws Exception {
         //GIVEN
-        Contact contactInput = new Contact(1L, "John", "Smith", null, null);
-        Contact contactSaved = new Contact(1L, "Steven", "Seagull", "0123456789", "mine@mail.com");
-        Mockito.when(contactService.updateContact(1L, contactInput)).thenReturn(contactSaved);
+        Long contactId = 1L;
+        Contact contactToUpdate = new Contact(1L, "Steven", "Seagull", "0123456789", "mine@mail.com");
 
-        String contactJson = """
-        {
-            "id": 1,
-            "firstName": "Steven",
-            "familyName": "Seagull",
-            "phoneNumber": "0123456789",
-            "email": "mine@mail.com"
-        }
-        """;
+        Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenReturn(contactToUpdate);
+
 
         //WHEN THEN
-        mockMvc.perform(put(ENDPOINT + "/1").content(contactJson).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put(ENDPOINT + "/" + contactId).content(new ObjectMapper().writeValueAsString(contactToUpdate)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))

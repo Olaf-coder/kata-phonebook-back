@@ -34,9 +34,10 @@ public class ContactServiceImpl implements ContactService {
         contactRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public Contact updateContact(Long contactId, Contact contactUpdated) {
-        Optional<Contact> contactOptional = getContactById(contactId);
+        Optional<Contact> contactOptional = this.getContactById(contactId);
 
         if (contactOptional.isEmpty()) {
             throw new RessourceNotFoundException("Contact does not exist");
@@ -50,15 +51,9 @@ public class ContactServiceImpl implements ContactService {
             contactEntityToSave.setFamilyName(contactUpdated.familyName());
             contactEntityToSave.setPhoneNumber(contactUpdated.phoneNumber());
             contactEntityToSave.setEmail(contactUpdated.email());
-
             return convertEntityToContact(contactRepository.save(contactEntityToSave));
         }
     }
-
-//    @Override
-//    public Contact updateContact(Contact contact) {
-//        return null;
-//    }
 
     @Override
     public List<Contact> getAllContacts() {
@@ -93,5 +88,4 @@ public class ContactServiceImpl implements ContactService {
         contactEntity.setEmail(contact.email());
         return contactEntity;
     }
-
 }
