@@ -116,7 +116,7 @@ class ContactControllerTest {
 
         String contactJson = """
         {
-            "id": "1"
+            "id": 1,
             "firstName": "Steven",
             "familyName": "Seagull",
             "phoneNumber": "0123456789",
@@ -125,7 +125,7 @@ class ContactControllerTest {
         """;
 
         //WHEN THEN
-        mockMvc.perform(put(ENDPOINT + "/1").contentType(MediaType.APPLICATION_JSON).content(contactJson))
+        mockMvc.perform(put(ENDPOINT + "/1").content(contactJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))
