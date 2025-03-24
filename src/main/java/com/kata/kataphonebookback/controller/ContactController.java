@@ -57,7 +57,11 @@ public class ContactController {
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
     public ResponseEntity<Contact> createNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody Contact contact) {
-        return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
+        try {
+            return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
+        } catch (InvalidDataException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 

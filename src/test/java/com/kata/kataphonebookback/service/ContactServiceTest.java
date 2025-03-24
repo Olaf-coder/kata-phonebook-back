@@ -76,6 +76,17 @@ class ContactServiceTest {
 
     }
 
+    @Test
+    void should_not_call_save_and_throw_InvalidDataException_when_addNewContact_is_called_with_not_all_mandatory_datas() {
+        //GIVEN
+        Contact inputContactTranslated = new Contact(null, "John", null, null, null);
+
+        //WHEN THEN
+        verify(contactRepository, never()).save(any(ContactEntity.class));
+        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.addNewContact(inputContactTranslated));
+
+    }
+
 //UPDATE
     @Test
     void should_call_save_with_new_correct_datas_and_return_updated_contact_when_updateContact_is_called_with_full_contact() {

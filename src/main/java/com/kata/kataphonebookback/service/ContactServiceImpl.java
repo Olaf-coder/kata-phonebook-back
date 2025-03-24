@@ -23,8 +23,13 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     @Transactional
-    public Contact addNewContact(Contact contact) {
+    public Contact addNewContact(Contact contact) throws InvalidDataException {
+//        return convertEntityToContact(contactRepository.save(convertContactToEntity(contact)));
+        if (ObjectUtils.isEmpty(contact.firstName()) || ObjectUtils.isEmpty(contact.familyName()) || contact.firstName().isBlank() || contact.familyName().isBlank()) {
+            throw new InvalidDataException("Contact first name or family name is missing");
+        }
         return convertEntityToContact(contactRepository.save(convertContactToEntity(contact)));
+
     }
 
 
@@ -36,7 +41,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Transactional
     @Override
-    public Contact updateContact(Long contactId, Contact contactUpdated) {
+    public Contact updateContact(Long contactId, Contact contactUpdated) throws RessourceNotFoundException, InvalidDataException {
         Optional<Contact> contactOptional = this.getContactById(contactId);
 
         if (contactOptional.isEmpty()) {
