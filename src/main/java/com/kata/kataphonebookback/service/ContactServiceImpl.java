@@ -1,9 +1,12 @@
 package com.kata.kataphonebookback.service;
 
+import com.kata.kataphonebookback.Exceptions.InvalidDataException;
+import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,27 @@ public class ContactServiceImpl implements ContactService {
         contactRepository.deleteById(id);
     }
 
+    @Override
+    public Contact updateContact(Long contactId, Contact contactUpdated) {
+        Optional<Contact> contactOptional = getContactById(contactId);
+
+        if (contactOptional.isEmpty()) {
+            throw new RessourceNotFoundException("Contact does not exist");
+        } else {
+            if (ObjectUtils.isEmpty(contactUpdated.firstName()) || ObjectUtils.isEmpty(contactUpdated.familyName()) || contactUpdated.firstName().isBlank() || contactUpdated.familyName().isBlank()) {
+                throw new InvalidDataException("Contact first name or family name is missing");
+            }
+            ContactEntity contactEntityToSave = new ContactEntity();
+            contactEntityToSave.setId(contactId);
+            contactEntityToSave.setFirstName(contactUpdated.firstName());
+            contactEntityToSave.setFamilyName(contactUpdated.familyName());
+            contactEntityToSave.setPhoneNumber(contactUpdated.phoneNumber());
+            contactEntityToSave.setEmail(contactUpdated.email());
+
+            return convertEntityToContact(contactRepository.save(contactEntityToSave));
+        }
+    }
+
 //    @Override
 //    public Contact updateContact(Contact contact) {
 //        return null;
@@ -48,12 +72,6 @@ public class ContactServiceImpl implements ContactService {
         Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
         return contactEntityOptional.map(this::convertEntityToContact);
     }
-
-//    @Override
-//    public Contact getContactById(Long id) {
-//    public Contact getContactById(Long id) {
-//        return convertEntityToContact(contactRepository.getReferenceById(id));
-//    }
 
 
     private Contact convertEntityToContact(ContactEntity contactEntity) {

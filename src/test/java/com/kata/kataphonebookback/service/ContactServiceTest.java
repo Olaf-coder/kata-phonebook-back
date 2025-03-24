@@ -1,5 +1,7 @@
 package com.kata.kataphonebookback.service;
 
+import com.kata.kataphonebookback.Exceptions.InvalidDataException;
+import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
 import org.assertj.core.api.Assertions;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
 
@@ -72,7 +75,84 @@ class ContactServiceTest {
         assertThat(actualContact).isEqualTo(expectedContact);
 
     }
-    //todo methodes en erreur
+
+//UPDATE
+    @Test
+    void should_call_save_with_new_correct_datas_and_return_updated_contact_when_updateContact_is_called_with_full_contact() {
+        //GIVEN
+        Long contactId = 1L;
+        Contact expectedContact = createExpectedContact();
+        ContactEntity existingContactEntity = createExistingContactEntity();
+        Mockito.when(contactRepository.findById(expectedContact.id())).thenReturn(Optional.of(existingContactEntity));
+        Mockito.when(contactRepository.save(existingContactEntity)).thenReturn(existingContactEntity);
+
+        //WHEN
+        Contact actualContact = contactService.updateContact(contactId, expectedContact);
+
+        //THEN
+        verify(contactRepository, times(1)).save(existingContactEntity);
+        assertThat(actualContact).isEqualTo(expectedContact);
+    }
+
+    @Test
+    void should_call_save_with_new_correct_datas_and_url_id_and_return_updated_contact_when_updateContact_is_called_with_full_contact() {
+        //GIVEN
+        Long contactId = 3L;
+        Contact expectedContact = new Contact(3L, "John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactEntity existingContactEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactEntity savedContactEntity = createContactEntity(3L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
+
+        Mockito.when(contactRepository.findById(expectedContact.id())).thenReturn(Optional.of(existingContactEntity));
+        Mockito.when(contactRepository.save(savedContactEntity)).thenReturn(savedContactEntity);
+
+        //WHEN
+        Contact actualContact = contactService.updateContact(contactId, expectedContact);
+
+        //THEN
+        verify(contactRepository, times(1)).save(savedContactEntity);
+        assertThat(actualContact).isEqualTo(expectedContact);
+    }
+
+    @Test
+    void should_throw_RessourceNotFoundException_when_updateContact_is_called_with_contact_and_unknown_id() {
+        //GIVEN
+        Long contactId = 5000L;
+        Contact contactUnknownId = new Contact(5000L, "John", "Smith", "0102030405", "mail@mail.com");
+        Mockito.when(contactRepository.findById(contactUnknownId.id())).thenReturn(Optional.empty());
+
+        //WHEN THEN
+        verify(contactRepository, never()).save(any(ContactEntity.class));
+        assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() -> contactService.updateContact(contactId, contactUnknownId));
+    }
+
+    @Test
+    void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_no_firstName() {
+        //GIVEN
+        Long contactId = 1L;
+        ContactEntity contactEntityExisting = createExistingContactEntity();
+        Contact contactUnknownFirstName = new Contact(1L, null, "Smith", "0102030405", "mail@mail.com");
+        Mockito.when(contactRepository.findById(contactUnknownFirstName.id())).thenReturn(Optional.of(contactEntityExisting));
+
+
+        //WHEN THEN
+        verify(contactRepository, never()).save(any(ContactEntity.class));
+        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, contactUnknownFirstName));
+    }
+
+    @Test
+    void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_familyName_Blank() {
+        //GIVEN
+        Long contactId = 1L;
+        ContactEntity contactEntityExisting = createExistingContactEntity();
+        Contact contactUnknownFamilyName = new Contact(1L, "John", "   ", "0102030405", "mail@mail.com");
+        Mockito.when(contactRepository.findById(contactUnknownFamilyName.id())).thenReturn(Optional.of(contactEntityExisting));
+
+
+        //WHEN THEN
+        verify(contactRepository, never()).save(any(ContactEntity.class));
+        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, contactUnknownFamilyName));
+    }
 
 //DELETE
     @Test
@@ -93,7 +173,7 @@ class ContactServiceTest {
 
 //READ
     @Test
-    void should_call_getReferenceById_once_with_correct_values_and_return_existing_contact_when_getContactById_is_called_with_correct_id() {
+    void should_call_getReferenceById_once_and_return_existing_contact_when_getContactById_is_called_with_correct_id() {
         //GIVEN
         Long id = 1L;
 
@@ -112,7 +192,7 @@ class ContactServiceTest {
     }
 
     @Test
-    void should_call_getReferenceById_once_with_correct_values_and_return_empty_when_getContactById_is_called_with_non_existing_id() {
+    void should_call_getReferenceById_once_and_return_Optional_empty_when_getContactById_is_called_with_non_existing_id() {
         //GIVEN
         Long id = 50L;
 
@@ -127,7 +207,6 @@ class ContactServiceTest {
         verify(contactRepository, times(1)).findById(id);
         assertThat(actualContact).isEmpty();
     }
-    //todo invalid parameter => exception
 
     @Test
     void should_call_findAll_once_and_return_existing_contact_when_getAllContacts_is_called_with_correct_id() {
@@ -183,4 +262,6 @@ class ContactServiceTest {
     private Contact convertEntityToContact(ContactEntity contactEntity) {
         return new Contact(contactEntity.getId(), contactEntity.getFirstName(), contactEntity.getFamilyName(), contactEntity.getPhoneNumber(), contactEntity.getEmail());
     }
+
+
 }

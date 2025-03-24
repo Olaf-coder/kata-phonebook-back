@@ -8,7 +8,7 @@ public interface ContactService {
 
     void deleteContact(Long id);
 
-//    Contact updateContact(Contact contact);
+    Contact updateContact(Long id, Contact contact);
 
     List<Contact> getAllContacts();
 

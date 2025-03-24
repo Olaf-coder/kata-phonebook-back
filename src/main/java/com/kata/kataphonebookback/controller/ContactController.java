@@ -1,5 +1,7 @@
 package com.kata.kataphonebookback.controller;
 
+import com.kata.kataphonebookback.Exceptions.InvalidDataException;
+import com.kata.kataphonebookback.Exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.service.Contact;
 import com.kata.kataphonebookback.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,4 +71,17 @@ public class ContactController {
     public void supressionContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
         contactService.deleteContact(contactId);
     }
+
+    @PutMapping("/{contactId}")
+    @Operation(summary="Mise à jour d'un contact précis")
+    public ResponseEntity<Contact> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody Contact contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
+        try {
+            return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
+        } catch (RessourceNotFoundException e) {
+            return new ResponseEntity<> (HttpStatus.NOT_FOUND);
+        } catch (InvalidDataException e) {
+            return new ResponseEntity<> (HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

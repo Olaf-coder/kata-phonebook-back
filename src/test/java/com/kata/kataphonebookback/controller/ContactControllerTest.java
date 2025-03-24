@@ -83,11 +83,57 @@ class ContactControllerTest {
     @Test
     void should_call_addNewContact_when_POST_contacts_with_contact_requestbody_is_called() throws Exception {
         //GIVEN
-//        Contact contactInput = new Contact(null, "John", "Smith", null, null);
-//        Contact contactSaved = new Contact(1L, "John", "Smith", null, null);
-//        Mockito.when(contactService.addNewContact(contactInput)).thenReturn(contactSaved);
+        Contact contactInput = new Contact(null, "John", "Smith", null, null);
+        Contact contactSaved = new Contact(1L, "John", "Smith", null, null);
+        Mockito.when(contactService.addNewContact(contactInput)).thenReturn(contactSaved);
+
+        String contactJson = """
+        {
+            "firstName": "John",
+            "familyName": "Smith"
+        }
+        """;
 
         //WHEN THEN
+        mockMvc.perform(post(ENDPOINT + "/").contentType(MediaType.APPLICATION_JSON).content(contactJson))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstName", is("John")))
+                .andExpect(jsonPath("$.familyName", is("Smith")))
+                .andExpect(jsonPath("$.phoneNumber", is(nullValue())))
+                .andExpect(jsonPath("$.email", is(nullValue())))
+                .andReturn();
+
+    }
+
+    @Test
+    void should_call_updateContact_when_PUT_contacts_with_contact_requestbody_is_called() throws Exception {
+        //GIVEN
+        Contact contactInput = new Contact(1L, "John", "Smith", null, null);
+        Contact contactSaved = new Contact(1L, "Steven", "Seagull", "0123456789", "mine@mail.com");
+        Mockito.when(contactService.updateContact(1L, contactInput)).thenReturn(contactSaved);
+
+        String contactJson = """
+        {
+            "id": "1"
+            "firstName": "Steven",
+            "familyName": "Seagull",
+            "phoneNumber": "0123456789",
+            "email": "mine@mail.com"
+        }
+        """;
+
+        //WHEN THEN
+        mockMvc.perform(put(ENDPOINT + "/1").contentType(MediaType.APPLICATION_JSON).content(contactJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.firstName", is("Steven")))
+                .andExpect(jsonPath("$.familyName", is("Seagull")))
+                .andExpect(jsonPath("$.phoneNumber", is("0123456789")))
+                .andExpect(jsonPath("$.email", is("mine@mail.com")))
+                .andReturn();
 
     }
 
