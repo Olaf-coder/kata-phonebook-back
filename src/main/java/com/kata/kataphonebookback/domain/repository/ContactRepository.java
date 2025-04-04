@@ -1,6 +1,6 @@
 package com.kata.kataphonebookback.domain.repository;
 
-import com.kata.kataphonebookback.domain.model.ContactEntity;
+import com.kata.kataphonebookback.domain.model.entity.ContactEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

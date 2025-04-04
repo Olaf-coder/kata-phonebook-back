@@ -1,16 +1,18 @@
 package com.kata.kataphonebookback.service;
 
+import com.kata.kataphonebookback.domain.model.dto.ContactDto;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface ContactService {
-    Contact addNewContact(Contact contact);
+    ContactDto addNewContact(ContactDto contact);
 
     void deleteContact(Long id);
 
-    Contact updateContact(Long id, Contact contact);
+    ContactDto updateContact(Long id, ContactDto contact);
 
-    List<Contact> getAllContacts();
+    List<ContactDto> getAllContacts();
 
-    Optional<Contact> getContactById(Long id);
+    Optional<ContactDto> getContactById(Long id);
 }

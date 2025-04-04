@@ -1,8 +1,10 @@
 package com.kata.kataphonebookback.service;
 
+import com.kata.kataphonebookback.domain.mapper.ContactMapper;
+import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 import com.kata.kataphonebookback.exceptions.InvalidDataException;
 import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
-import com.kata.kataphonebookback.domain.model.ContactEntity;
+import com.kata.kataphonebookback.domain.model.entity.ContactEntity;
 import com.kata.kataphonebookback.domain.repository.ContactRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,19 +17,21 @@ import java.util.Optional;
 public class ContactServiceImpl implements ContactService {
 
     private final ContactRepository contactRepository;
+    private final ContactMapper contactMapper;
 
-    public ContactServiceImpl(ContactRepository contactRepository) {
+    public ContactServiceImpl(ContactRepository contactRepository, ContactMapper contactMapper) {
         this.contactRepository = contactRepository;
+        this.contactMapper = contactMapper;
     }
 
 
     @Override
     @Transactional
-    public Contact addNewContact(Contact contact) throws InvalidDataException {
+    public ContactDto addNewContact(ContactDto contact) throws InvalidDataException {
         if (ObjectUtils.isEmpty(contact.firstName()) || ObjectUtils.isEmpty(contact.familyName()) || contact.firstName().isBlank() || contact.familyName().isBlank()) {
             throw new InvalidDataException("Contact first name or family name is missing");
         }
-        return convertEntityToContact(contactRepository.save(convertContactToEntity(contact)));
+        return contactMapper.toDto(contactRepository.save(contactMapper.toEntity(contact)));
 
     }
 
@@ -40,8 +44,8 @@ public class ContactServiceImpl implements ContactService {
 
     @Transactional
     @Override
-    public Contact updateContact(Long contactId, Contact contactUpdated) throws RessourceNotFoundException, InvalidDataException {
-        Optional<Contact> contactOptional = this.getContactById(contactId);
+    public ContactDto updateContact(Long contactId, ContactDto contactUpdated) throws RessourceNotFoundException, InvalidDataException {
+        Optional<ContactDto> contactOptional = this.getContactById(contactId);
 
         if (contactOptional.isEmpty()) {
             throw new RessourceNotFoundException("Contact does not exist");
@@ -55,41 +59,42 @@ public class ContactServiceImpl implements ContactService {
             contactEntityToSave.setFamilyName(contactUpdated.familyName());
             contactEntityToSave.setPhoneNumber(contactUpdated.phoneNumber());
             contactEntityToSave.setEmail(contactUpdated.email());
-            return convertEntityToContact(contactRepository.save(contactEntityToSave));
+            return contactMapper.toDto(contactRepository.save(contactEntityToSave));
         }
     }
 
     @Override
-    public List<Contact> getAllContacts() {
+    public List<ContactDto> getAllContacts() {
         List<ContactEntity> contacts = contactRepository.findAll();
+        return contacts.stream().map(contactMapper::toDto).toList();
 
-        return contacts.stream().map(this::convertEntityToContact).toList();
+//        return contacts.stream().map(this::convertEntityToContact).toList();
     }
 
     @Override
-    public Optional<Contact> getContactById(Long id) {
+    public Optional<ContactDto> getContactById(Long id) {
         Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
-        return contactEntityOptional.map(this::convertEntityToContact);
+        return contactEntityOptional.map(contactMapper::toDto);
+//        return contactEntityOptional.map(this::convertEntityToContact);
     }
 
-
-    private Contact convertEntityToContact(ContactEntity contactEntity) {
-        return new Contact(
-                contactEntity.getId(),
-                contactEntity.getFirstName(),
-                contactEntity.getFamilyName(),
-                contactEntity.getPhoneNumber(),
-                contactEntity.getEmail()
-        );
-    }
-
-    private ContactEntity convertContactToEntity(Contact contact) {
-        ContactEntity contactEntity = new ContactEntity();
-        contactEntity.setId(contact.id());
-        contactEntity.setFirstName(contact.firstName());
-        contactEntity.setFamilyName(contact.familyName());
-        contactEntity.setPhoneNumber(contact.phoneNumber());
-        contactEntity.setEmail(contact.email());
-        return contactEntity;
-    }
+//    private ContactDto convertEntityToContact(ContactEntity contactEntity) {// appeler mapper, et creer un mapper a coté
+//        return new ContactDto(
+//                contactEntity.getId(),
+//                contactEntity.getFirstName(),
+//                contactEntity.getFamilyName(),
+//                contactEntity.getPhoneNumber(),
+//                contactEntity.getEmail()
+//        );
+//    }
+//
+//    private ContactEntity convertContactToEntity(ContactDto contact) {// appeler mapper et creer un mapper a côté, mappstruct, doser, ...
+//        ContactEntity contactEntity = new ContactEntity();
+//        contactEntity.setId(contact.id());
+//        contactEntity.setFirstName(contact.firstName());
+//        contactEntity.setFamilyName(contact.familyName());
+//        contactEntity.setPhoneNumber(contact.phoneNumber());
+//        contactEntity.setEmail(contact.email());
+//        return contactEntity;
+//    }
 }

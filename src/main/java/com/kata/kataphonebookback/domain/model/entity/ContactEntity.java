@@ -1,4 +1,4 @@
-package com.kata.kataphonebookback.domain.model;
+package com.kata.kataphonebookback.domain.model.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;

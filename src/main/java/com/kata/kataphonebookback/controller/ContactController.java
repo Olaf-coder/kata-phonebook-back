@@ -2,7 +2,7 @@ package com.kata.kataphonebookback.controller;
 
 import com.kata.kataphonebookback.exceptions.InvalidDataException;
 import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
-import com.kata.kataphonebookback.service.Contact;
+import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 import com.kata.kataphonebookback.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,12 +31,12 @@ public class ContactController {
     @Operation(summary = "Recuperation des tous les contacts du repertoire")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Contacts récupérés",
-                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Contact.class)
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ContactDto.class)
                     )}),
             @ApiResponse(responseCode = "404", description = "Echec de la récuperation",
                     content = @Content)
     })
-    public ResponseEntity<List<Contact>> getAllContact() {
+    public ResponseEntity<List<ContactDto>> getAllContact() {
         return new ResponseEntity<>(contactService.getAllContacts(), HttpStatus.OK);
     }
 
@@ -44,19 +44,19 @@ public class ContactController {
     @Operation(summary = "Recuperation d'un contact précis")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Contact récupéré",
-                content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Contact.class)
+                content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ContactDto.class)
             )}),
             @ApiResponse(responseCode = "404", description = "Echec de la récuperation, la ressource n'existe pas", content = @Content )
     })
-    public ResponseEntity<Contact> getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
-        Optional<Contact> contactOpt = contactService.getContactById(contactId);
+    public ResponseEntity<ContactDto> getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
+        Optional<ContactDto> contactOpt = contactService.getContactById(contactId);
         return contactOpt.map(contact -> new ResponseEntity<>(contact, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
     }
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
-    public ResponseEntity<Contact> createNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody Contact contact) {
+    public ResponseEntity<ContactDto> createNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
         try {
             return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
         } catch (InvalidDataException e) {
@@ -78,7 +78,7 @@ public class ContactController {
 
     @PutMapping("/{contactId}")
     @Operation(summary="Mise à jour d'un contact précis")
-    public ResponseEntity<Contact> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody Contact contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
+    public ResponseEntity<ContactDto> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody ContactDto contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
         try {
             return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
         } catch (RessourceNotFoundException e) {

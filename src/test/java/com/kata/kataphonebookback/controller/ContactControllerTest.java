@@ -3,7 +3,7 @@ package com.kata.kataphonebookback.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kata.kataphonebookback.exceptions.InvalidDataException;
 import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
-import com.kata.kataphonebookback.service.Contact;
+import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 import com.kata.kataphonebookback.service.ContactService;
 import com.kata.kataphonebookback.service.ContactServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -44,11 +44,11 @@ class ContactControllerTest {
     @Test
     void should_call_contactService_and_return_200_and_Contacts_getAllContact_when_GET_contacts_is_called() throws Exception{
         //GIVEN
-        List<Contact> contacts = List.of(
-                new Contact(1L, "John", "Smith", null, null),
-                new Contact(2L, "William", "Saurin", "saurinwilliam@mail.com", "060102030405"),
-                new Contact(3L, "Sophie", "Saurin", "saurinsophie@mail.com", null),
-                new Contact(4L, "Michel", "Palaref", null, null));
+        List<ContactDto> contacts = List.of(
+                new ContactDto(1L, "John", "Smith", null, null),
+                new ContactDto(2L, "William", "Saurin", "saurinwilliam@mail.com", "060102030405"),
+                new ContactDto(3L, "Sophie", "Saurin", "saurinsophie@mail.com", null),
+                new ContactDto(4L, "Michel", "Palaref", null, null));
         Mockito.when(contactService.getAllContacts()).thenReturn(contacts);
 
         //WHEN THEN
@@ -68,7 +68,7 @@ class ContactControllerTest {
     @Test
     void should_call_getContactById_and_return_200_and_Contact_when_GET_contacts_with_id_is_called() throws Exception {
         //GIVEN
-        Contact contact = new Contact(1L, "John", "Smith", null, null);
+        ContactDto contact = new ContactDto(1L, "John", "Smith", null, null);
         Mockito.when(contactService.getContactById(1L)).thenReturn(Optional.of(contact));
 
         //WHEN THEN
@@ -99,8 +99,8 @@ class ContactControllerTest {
     @Test
     void should_call_addNewContact_and_return_201_and_Contact_when_POST_contacts_with_contact_requestbody_is_called() throws Exception {
         //GIVEN
-        Contact contactInput = new Contact(null, "John", "Smith", null, null);
-        Contact contactSaved = new Contact(1L, "John", "Smith", null, null);
+        ContactDto contactInput = new ContactDto(null, "John", "Smith", null, null);
+        ContactDto contactSaved = new ContactDto(1L, "John", "Smith", null, null);
         Mockito.when(contactService.addNewContact(contactInput)).thenReturn(contactSaved);
 
         String contactJson = """
@@ -125,7 +125,7 @@ class ContactControllerTest {
     @Test
     void should_call_addNewContact_and_return_400_when_POST_contacts_with_bad_Contact_requestbody_is_called() throws Exception {
         //GIVEN
-        Contact contactBad = new Contact(null, "John", null, null, null);
+        ContactDto contactBad = new ContactDto(null, "John", null, null, null);
         Mockito.when(contactService.addNewContact(contactBad)).thenThrow(new InvalidDataException("bad datas"));
 
         String contactJson = """
@@ -144,7 +144,7 @@ class ContactControllerTest {
     void should_call_updateContact_and_return_200_and_updated_Contact_when_PUT_contacts_with_contact_requestbody_is_called() throws Exception {
         //GIVEN
         Long contactId = 1L;
-        Contact contactToUpdate = new Contact(1L, "Steven", "Seagull", "0123456789", "mine@mail.com");
+        ContactDto contactToUpdate = new ContactDto(1L, "Steven", "Seagull", "0123456789", "mine@mail.com");
 
         Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenReturn(contactToUpdate);
 
@@ -165,7 +165,7 @@ class ContactControllerTest {
     void should_call_updateContact_and_return_400_when_PUT_contacts_with_bad_Contact_requestbody_is_called() throws Exception {
         //GIVEN
         Long contactId = 1L;
-        Contact contactToUpdate = new Contact(1L, "Steven", null, "0123456789", "mine@mail.com");
+        ContactDto contactToUpdate = new ContactDto(1L, "Steven", null, "0123456789", "mine@mail.com");
 
         Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new InvalidDataException("bad datas"));
 
@@ -181,7 +181,7 @@ class ContactControllerTest {
     void should_call_updateContact_and_return_404_when_PUT_contacts_with_id_in_url_not_found_is_called() throws Exception {
         //GIVEN
         Long contactId = 1L;
-        Contact contactToUpdate = new Contact(1L, "Steven", null, "0123456789", "mine@mail.com");
+        ContactDto contactToUpdate = new ContactDto(1L, "Steven", null, "0123456789", "mine@mail.com");
 
         Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new RessourceNotFoundException("Contact does not exist"));
 
