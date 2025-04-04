@@ -41,12 +41,12 @@ class ContactServiceTest {
     @Test
     void should_call_save_once_with_correct_values_and_return_saved_contact_when_addNewContact_is_called_with_full_contact_and_no_id() {
         //GIVEN
-        ContactEntity inputEntity = createExistingContactEntity();
+        ContactEntity inputEntity = createContactEntity(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
         inputEntity.setId(null);
         ContactDto inputDto = new ContactDto(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
 
-        ContactEntity savedEntity = createExistingContactEntity();
-        ContactDto expectedDto = createExpectedContactDto();
+        ContactEntity savedEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactDto expectedDto = new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         when(contactMapper.toEntity(inputDto)).thenReturn(inputEntity);
         when(contactRepository.save(inputEntity)).thenReturn(savedEntity);
         when(contactMapper.toDto(savedEntity)).thenReturn(expectedDto);
@@ -151,7 +151,7 @@ class ContactServiceTest {
         //GIVEN
         Long contactId = 5000L;
         ContactDto contactUnknownId = new ContactDto(5000L, "John", "Smith", "0102030405", "mail@mail.com");
-        when(contactRepository.findById(contactUnknownId.id())).thenReturn(Optional.empty());
+        when(contactRepository.findById(contactId)).thenReturn(Optional.empty());
 
         //WHEN THEN
         verify(contactRepository, never()).save(any(ContactEntity.class));
@@ -162,7 +162,7 @@ class ContactServiceTest {
     void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_no_firstName() {
         //GIVEN
         Long contactId = 1L;
-        ContactEntity existingEntity = createExistingContactEntity();
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         ContactDto dtoUnknownFirstName = new ContactDto(1L, null, "Smith", "0102030405", "mail@mail.com");
 
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
@@ -178,7 +178,7 @@ class ContactServiceTest {
     void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_familyName_Blank() {
         //GIVEN
         Long contactId = 1L;
-        ContactEntity existingEntity = createExistingContactEntity();
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         ContactDto dtoUnknownFamilyName = new ContactDto(1L, "John", "   ", "0102030405", "mail@mail.com");
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
         when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoUnknownFamilyName);
@@ -212,8 +212,8 @@ class ContactServiceTest {
         //GIVEN
         Long id = 1L;
 
-        ContactEntity existingEntity = createExistingContactEntity();
-        ContactDto expectedDto = createExpectedContactDto();
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactDto expectedDto = new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         when(contactRepository.findById(id)).thenReturn(Optional.of(existingEntity));
         when(contactMapper.toDto(existingEntity)).thenReturn(expectedDto);
 
@@ -281,14 +281,6 @@ class ContactServiceTest {
                 new ContactDto(3L, "Sophie", "Saurin", "saurinsophie@mail.com", null),
                 new ContactDto(4L, "Michel", "Palaref", null, null)
         );
-    }
-
-    private ContactEntity createExistingContactEntity() {
-        return createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
-    }
-
-    private ContactDto createExpectedContactDto() {
-        return new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
     }
 
     private ContactEntity createContactEntity(Long id, String firstName, String familyName, String phoneNumber, String email) {
