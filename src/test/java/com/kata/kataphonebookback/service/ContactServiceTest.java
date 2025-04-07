@@ -41,12 +41,12 @@ class ContactServiceTest {
     @Test
     void should_call_save_once_with_correct_values_and_return_saved_contact_when_addNewContact_is_called_with_full_contact_and_no_id() {
         //GIVEN
-        ContactEntity inputEntity = createContactEntity(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
-        inputEntity.setId(null);
         ContactDto inputDto = new ContactDto(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
-
-        ContactEntity savedEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         ContactDto expectedDto = new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
+        ContactEntity inputEntity = createContactEntity(null,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactEntity savedEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         when(contactMapper.toEntity(inputDto)).thenReturn(inputEntity);
         when(contactRepository.save(inputEntity)).thenReturn(savedEntity);
         when(contactMapper.toDto(savedEntity)).thenReturn(expectedDto);
@@ -66,11 +66,12 @@ class ContactServiceTest {
     @Test
     void should_call_save_once_with_correct_values_and_return_saved_contact_when_addNewContact_is_called_with_only_mandatory_data_and_no_id() {
         //GIVEN
-        ContactEntity inputEntity = createContactEntity(null, "John", "Smith", null, null);
         ContactDto inputDto = new ContactDto(null, "John", "Smith", null, null);
-
-        ContactEntity savedEntity = createContactEntity(1L, "John", "Smith", null, null);
         ContactDto expectedContact = new ContactDto(1L, "John", "Smith", null, null);
+
+        ContactEntity inputEntity = createContactEntity(null, "John", "Smith", null, null);
+        ContactEntity savedEntity = createContactEntity(1L, "John", "Smith", null, null);
+
         when(contactMapper.toEntity(inputDto)).thenReturn(inputEntity);
         when(contactRepository.save(inputEntity)).thenReturn(savedEntity);
         when(contactMapper.toDto(savedEntity)).thenReturn(expectedContact);
@@ -103,10 +104,13 @@ class ContactServiceTest {
     void should_call_save_with_new_correct_datas_and_return_updated_contact_when_updateContact_is_called_with_full_contact() {
         //GIVEN
         Long contactId = 1L;
+
         ContactDto expectedDto = new ContactDto(1L, "Sarah", "Connor", null, null);
-        ContactEntity expectedEntity = createContactEntity(1L, "Sarah", "Connor", null, null);
         ContactDto existingDto = new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
+        ContactEntity expectedEntity = createContactEntity(1L, "Sarah", "Connor", null, null);
         ContactEntity existingContactEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingContactEntity));
         when(contactMapper.toDto(existingContactEntity)).thenReturn(existingDto);
         when(contactRepository.save(expectedEntity)).thenReturn(expectedEntity);
@@ -126,10 +130,11 @@ class ContactServiceTest {
     void should_call_save_with_new_correct_datas_and_url_id_and_return_updated_contact_when_updateContact_is_called_with_full_contact() {
         //GIVEN
         Long contactId = 3L;
+
         ContactDto expectedDto = new ContactDto(3L, "John", "Smith", "john.smith@gmail.com", "0102030405");
+
         ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         ContactEntity savedContactEntity = createContactEntity(3L,"John", "Smith", "john.smith@gmail.com", "0102030405");
-
 
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
         when(contactRepository.save(savedContactEntity)).thenReturn(savedContactEntity);
@@ -150,7 +155,9 @@ class ContactServiceTest {
     void should_throw_RessourceNotFoundException_when_updateContact_is_called_with_contact_and_unknown_id() {
         //GIVEN
         Long contactId = 5000L;
+
         ContactDto contactUnknownId = new ContactDto(5000L, "John", "Smith", "0102030405", "mail@mail.com");
+
         when(contactRepository.findById(contactId)).thenReturn(Optional.empty());
 
         //WHEN THEN
@@ -162,8 +169,10 @@ class ContactServiceTest {
     void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_no_firstName() {
         //GIVEN
         Long contactId = 1L;
-        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         ContactDto dtoUnknownFirstName = new ContactDto(1L, null, "Smith", "0102030405", "mail@mail.com");
+
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
 
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
         when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoUnknownFirstName);
@@ -178,8 +187,11 @@ class ContactServiceTest {
     void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_familyName_Blank() {
         //GIVEN
         Long contactId = 1L;
-        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         ContactDto dtoUnknownFamilyName = new ContactDto(1L, "John", "   ", "0102030405", "mail@mail.com");
+
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
         when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoUnknownFamilyName);
 
@@ -212,8 +224,10 @@ class ContactServiceTest {
         //GIVEN
         Long id = 1L;
 
-        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
         ContactDto expectedDto = new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");new ContactDto(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
+        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+
         when(contactRepository.findById(id)).thenReturn(Optional.of(existingEntity));
         when(contactMapper.toDto(existingEntity)).thenReturn(expectedDto);
 
@@ -234,7 +248,6 @@ class ContactServiceTest {
 
         when(contactRepository.findById(id)).thenReturn(Optional.empty());
 
-
         //WHEN
         Optional<ContactDto> actualContact = contactService.getContactById(id);
 
@@ -247,8 +260,9 @@ class ContactServiceTest {
     @Test
     void should_call_findAll_once_and_return_existing_contact_when_getAllContacts_is_called_with_correct_id() {
         //GIVEN
-        List<ContactEntity> existingEntities = createExistingContactEntities();
         List<ContactDto> expectedDtos = createExpectedContactDtos();
+
+        List<ContactEntity> existingEntities = createExistingContactEntities();
 
         when(contactRepository.findAll()).thenReturn(existingEntities);
         when(contactMapper.toDto(any(ContactEntity.class)))
@@ -292,6 +306,4 @@ class ContactServiceTest {
         contactEntity.setPhoneNumber(phoneNumber);
         return contactEntity;
     }
-
-
 }
