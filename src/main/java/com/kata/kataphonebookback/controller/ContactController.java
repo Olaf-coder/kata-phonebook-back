@@ -56,7 +56,7 @@ public class ContactController {
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
-    public ResponseEntity<ContactDto> createNewContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
+    public ResponseEntity<ContactDto> createContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
         try {
             return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
         } catch (InvalidDataException e) {
@@ -72,7 +72,7 @@ public class ContactController {
                     content = @Content)
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void supressionContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
+    public void deleteContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
         contactService.deleteContact(contactId);
     }
 

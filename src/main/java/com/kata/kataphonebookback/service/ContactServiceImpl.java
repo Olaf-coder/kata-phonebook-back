@@ -67,34 +67,11 @@ public class ContactServiceImpl implements ContactService {
     public List<ContactDto> getAllContacts() {
         List<ContactEntity> contacts = contactRepository.findAll();
         return contacts.stream().map(contactMapper::toDto).toList();
-
-//        return contacts.stream().map(this::convertEntityToContact).toList();
     }
 
     @Override
     public Optional<ContactDto> getContactById(Long id) {
         Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
         return contactEntityOptional.map(contactMapper::toDto);
-//        return contactEntityOptional.map(this::convertEntityToContact);
     }
-
-//    private ContactDto convertEntityToContact(ContactEntity contactEntity) {// appeler mapper, et creer un mapper a coté
-//        return new ContactDto(
-//                contactEntity.getId(),
-//                contactEntity.getFirstName(),
-//                contactEntity.getFamilyName(),
-//                contactEntity.getPhoneNumber(),
-//                contactEntity.getEmail()
-//        );
-//    }
-//
-//    private ContactEntity convertContactToEntity(ContactDto contact) {// appeler mapper et creer un mapper a côté, mappstruct, doser, ...
-//        ContactEntity contactEntity = new ContactEntity();
-//        contactEntity.setId(contact.id());
-//        contactEntity.setFirstName(contact.firstName());
-//        contactEntity.setFamilyName(contact.familyName());
-//        contactEntity.setPhoneNumber(contact.phoneNumber());
-//        contactEntity.setEmail(contact.email());
-//        return contactEntity;
-//    }
 }
