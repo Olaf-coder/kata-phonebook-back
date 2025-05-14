@@ -40,6 +40,7 @@ public class ContactController {
         return new ResponseEntity<>(contactService.getAllContacts(), HttpStatus.OK);
     }
 
+    //TODO delete orElseGet , service return Value Directly
     @GetMapping("/{contactId}")
     @Operation(summary = "Recuperation d'un contact précis")
     @ApiResponses(value = {
@@ -56,7 +57,9 @@ public class ContactController {
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
+    //TODO Ajouter le reste des annotations.
     public ResponseEntity<ContactDto> createContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
+        //TODO ControllerAdvice, retirer le try catch
         try {
             return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
         } catch (InvalidDataException e) {
@@ -76,9 +79,11 @@ public class ContactController {
         contactService.deleteContact(contactId);
     }
 
+
     @PutMapping("/{contactId}")
     @Operation(summary="Mise à jour d'un contact précis")
     public ResponseEntity<ContactDto> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody ContactDto contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
+        //TODO ControllerAdvice, retirer le try catch
         try {
             return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
         } catch (RessourceNotFoundException e) {

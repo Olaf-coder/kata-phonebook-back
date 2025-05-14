@@ -219,6 +219,7 @@ class ContactServiceTest {
     }
 
 //READ
+    //TODO return not an Optional but value directly
     @Test
     void should_call_getReferenceById_once_and_return_existing_contact_when_getContactById_is_called_with_correct_id() {
         //GIVEN
@@ -241,6 +242,7 @@ class ContactServiceTest {
         assertThat(actualContact).isNotEmpty().contains(expectedDto);
     }
 
+    //TODO and raise RessourceNotFoundException.
     @Test
     void should_call_getReferenceById_once_and_return_Optional_empty_when_getContactById_is_called_with_non_existing_id() {
         //GIVEN

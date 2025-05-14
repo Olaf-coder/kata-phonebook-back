@@ -69,9 +69,14 @@ public class ContactServiceImpl implements ContactService {
         return contacts.stream().map(contactMapper::toDto).toList();
     }
 
+    //TODO raise RessourceNotFoundException, return directly the value otherwise
+    //
     @Override
     public Optional<ContactDto> getContactById(Long id) {
         Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
+//        if (contactEntityOptional.isEmpty()) {
+//            throw new RessourceNotFoundException("Contact does not exist");
+//        }
         return contactEntityOptional.map(contactMapper::toDto);
     }
 }
