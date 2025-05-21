@@ -63,6 +63,7 @@ public class ContactServiceImpl implements ContactService {
         }
     }
 
+    //TODO Ajouter une exception si la liste est vide.
     @Override
     public List<ContactDto> getAllContacts() {
         List<ContactEntity> contacts = contactRepository.findAll();

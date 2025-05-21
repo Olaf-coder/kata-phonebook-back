@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -260,7 +261,7 @@ class ContactServiceTest {
     }
 
     @Test
-    void should_call_findAll_once_and_return_existing_contact_when_getAllContacts_is_called_with_correct_id() {
+    void should_call_findAll_once_and_return_existing_contact_when_getAllContacts_is_called_and_Contacts_are_Registered() {
         //GIVEN
         List<ContactDto> expectedDtos = createExpectedContactDtos();
 
@@ -278,6 +279,25 @@ class ContactServiceTest {
         //THEN
         verify(contactRepository, times(1)).findAll();
         verify(contactMapper, times(expectedDtos.size())).toDto(any(ContactEntity.class));
+        assertThat(actualDtos).isEqualTo(expectedDtos);
+    }
+
+    //TODO Ajouter la remontée d'exceptions
+    @Test
+    void should_call_findAll_once_and_return_RessourceNotFoundException_contact_when_getAllContacts_is_called_and_Contacts_are_not_Registered() {
+        //GIVEN
+        List<ContactDto> expectedDtos = createExpectedContactDtos();
+
+        List<ContactEntity> existingEntities = new ArrayList<>();
+
+        when(contactRepository.findAll()).thenReturn(existingEntities);
+
+        //WHEN
+        List<ContactDto> actualDtos = contactService.getAllContacts();
+
+        //THEN
+        verify(contactRepository, times(1)).findAll();
+        verify(contactMapper, never()).toDto(any(ContactEntity.class));
         assertThat(actualDtos).isEqualTo(expectedDtos);
     }
 

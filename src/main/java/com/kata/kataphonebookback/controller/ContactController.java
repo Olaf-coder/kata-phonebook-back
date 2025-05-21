@@ -57,6 +57,12 @@ public class ContactController {
 
     @PostMapping("/")
     @Operation(summary = "Ajout d'un nouveau contact")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact créé",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ContactDto.class)
+                    )}),
+            @ApiResponse(responseCode = "404", description = "Echec de la création, la ressource n'existe pas", content = @Content )
+    })
     //TODO Ajouter le reste des annotations.
     public ResponseEntity<ContactDto> createContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
         //TODO ControllerAdvice, retirer le try catch
