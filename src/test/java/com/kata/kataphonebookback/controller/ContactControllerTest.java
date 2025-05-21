@@ -69,7 +69,7 @@ class ContactControllerTest {
     void should_call_getContactById_and_return_200_and_Contact_when_GET_contacts_with_id_is_called() throws Exception {
         //GIVEN
         ContactDto contact = new ContactDto(1L, "John", "Smith", null, null);
-        Mockito.when(contactService.getContactById(1L)).thenReturn(Optional.of(contact));
+        Mockito.when(contactService.getContactById(1L)).thenReturn(contact);
 
         //WHEN THEN
         mockMvc.perform(get(ENDPOINT +"/1"))
@@ -87,11 +87,11 @@ class ContactControllerTest {
     @Test
     void should_call_getContactById_and_return_404_and_Contact_when_GET_contacts_with_id_is_called() throws Exception {
         //GIVEN
-        Long contactId = 50L;
-        Mockito.when(contactService.getContactById(contactId)).thenReturn(Optional.empty());
+        Long contactIdUnknown = 50L;
+        Mockito.when(contactService.getContactById(contactIdUnknown)).thenThrow(new RessourceNotFoundException("Contact not found"));
 
         //WHEN THEN
-        mockMvc.perform(get(ENDPOINT +"/" + contactId))
+        mockMvc.perform(get(ENDPOINT +"/" + contactIdUnknown))
                 .andExpect(status().isNotFound())
                 .andReturn();
     }

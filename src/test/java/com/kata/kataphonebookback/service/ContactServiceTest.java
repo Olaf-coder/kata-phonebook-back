@@ -95,8 +95,8 @@ class ContactServiceTest {
         ContactDto inputDto = new ContactDto(null, "John", null, null, null);
 
         //WHEN THEN
-        verify(contactRepository, never()).save(any(ContactEntity.class));
         assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.addNewContact(inputDto));
+        verify(contactRepository, never()).save(any(ContactEntity.class));
 
     }
 
@@ -155,15 +155,15 @@ class ContactServiceTest {
     @Test
     void should_throw_RessourceNotFoundException_when_updateContact_is_called_with_contact_and_unknown_id() {
         //GIVEN
-        Long contactId = 5000L;
+        Long contactIdUnknown = 5000L;
 
-        ContactDto contactUnknownId = new ContactDto(5000L, "John", "Smith", "0102030405", "mail@mail.com");
+        ContactDto dtoContactUpdated = new ContactDto(5000L, "John", "Smith", "0102030405", "mail@mail.com");
 
-        when(contactRepository.findById(contactId)).thenReturn(Optional.empty());
+        when(contactRepository.findById(contactIdUnknown)).thenReturn(Optional.empty());
 
         //WHEN THEN
+        assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() -> contactService.updateContact(contactIdUnknown, dtoContactUpdated));
         verify(contactRepository, never()).save(any(ContactEntity.class));
-        assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() -> contactService.updateContact(contactId, contactUnknownId));
     }
 
     @Test
@@ -198,8 +198,8 @@ class ContactServiceTest {
 
 
         //WHEN THEN
-        verify(contactRepository, never()).save(any(ContactEntity.class));
         assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, dtoUnknownFamilyName));
+        verify(contactRepository, never()).save(any(ContactEntity.class));
     }
 
 //DELETE
@@ -235,29 +235,26 @@ class ContactServiceTest {
 
 
         //WHEN
-        Optional<ContactDto> actualContact = contactService.getContactById(id);
+        ContactDto actualContact = contactService.getContactById(id);
 
 
         //THEN
         verify(contactRepository, times(1)).findById(id);
-        assertThat(actualContact).isNotEmpty().contains(expectedDto);
+        assertThat(actualContact).isEqualTo(expectedDto);
     }
 
     //TODO and raise RessourceNotFoundException.
     @Test
-    void should_call_getReferenceById_once_and_return_Optional_empty_when_getContactById_is_called_with_non_existing_id() {
+    void should_call_getReferenceById_once_and_raise_RessourceNotFoundException_when_getContactById_is_called_with_non_existing_id() {
         //GIVEN
         Long id = 50L;
 
         when(contactRepository.findById(id)).thenReturn(Optional.empty());
 
-        //WHEN
-        Optional<ContactDto> actualContact = contactService.getContactById(id);
 
-
-        //THEN
+        //WHEN THEN
+        assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() ->contactService.getContactById(id));
         verify(contactRepository, times(1)).findById(id);
-        assertThat(actualContact).isEmpty();
     }
 
     @Test
@@ -287,18 +284,14 @@ class ContactServiceTest {
     void should_call_findAll_once_and_return_RessourceNotFoundException_contact_when_getAllContacts_is_called_and_Contacts_are_not_Registered() {
         //GIVEN
         List<ContactDto> expectedDtos = createExpectedContactDtos();
-
         List<ContactEntity> existingEntities = new ArrayList<>();
 
         when(contactRepository.findAll()).thenReturn(existingEntities);
 
-        //WHEN
-        List<ContactDto> actualDtos = contactService.getAllContacts();
-
-        //THEN
+        //WHEN THEN
+        assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() -> contactService.getAllContacts());
         verify(contactRepository, times(1)).findAll();
         verify(contactMapper, never()).toDto(any(ContactEntity.class));
-        assertThat(actualDtos).isEqualTo(expectedDtos);
     }
 
     private List<ContactEntity> createExistingContactEntities()

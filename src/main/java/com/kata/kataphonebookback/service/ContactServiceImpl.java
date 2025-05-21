@@ -45,39 +45,33 @@ public class ContactServiceImpl implements ContactService {
     @Transactional
     @Override
     public ContactDto updateContact(Long contactId, ContactDto contactUpdated) throws RessourceNotFoundException, InvalidDataException {
-        Optional<ContactDto> contactOptional = this.getContactById(contactId);
+        this.getContactById(contactId);
 
-        if (contactOptional.isEmpty()) {
-            throw new RessourceNotFoundException("Contact does not exist");
-        } else {
-            if (ObjectUtils.isEmpty(contactUpdated.firstName()) || ObjectUtils.isEmpty(contactUpdated.familyName()) || contactUpdated.firstName().isBlank() || contactUpdated.familyName().isBlank()) {
-                throw new InvalidDataException("Contact first name or family name is missing");
-            }
-            ContactEntity contactEntityToSave = new ContactEntity();
-            contactEntityToSave.setId(contactId);
-            contactEntityToSave.setFirstName(contactUpdated.firstName());
-            contactEntityToSave.setFamilyName(contactUpdated.familyName());
-            contactEntityToSave.setPhoneNumber(contactUpdated.phoneNumber());
-            contactEntityToSave.setEmail(contactUpdated.email());
-            return contactMapper.toDto(contactRepository.save(contactEntityToSave));
+        if (ObjectUtils.isEmpty(contactUpdated.firstName()) || ObjectUtils.isEmpty(contactUpdated.familyName()) || contactUpdated.firstName().isBlank() || contactUpdated.familyName().isBlank()) {
+            throw new InvalidDataException("Contact first name or family name is missing");
         }
+        ContactEntity contactEntityToSave = new ContactEntity();
+        contactEntityToSave.setId(contactId);
+        contactEntityToSave.setFirstName(contactUpdated.firstName());
+        contactEntityToSave.setFamilyName(contactUpdated.familyName());
+        contactEntityToSave.setPhoneNumber(contactUpdated.phoneNumber());
+        contactEntityToSave.setEmail(contactUpdated.email());
+        return contactMapper.toDto(contactRepository.save(contactEntityToSave));
     }
 
-    //TODO Ajouter une exception si la liste est vide.
     @Override
     public List<ContactDto> getAllContacts() {
         List<ContactEntity> contacts = contactRepository.findAll();
+        if (contacts.isEmpty()) {
+            throw new RessourceNotFoundException("No contacts found");
+        }
         return contacts.stream().map(contactMapper::toDto).toList();
     }
 
-    //TODO raise RessourceNotFoundException, return directly the value otherwise
-    //
     @Override
-    public Optional<ContactDto> getContactById(Long id) {
+    public ContactDto getContactById(Long id) throws RessourceNotFoundException {
         Optional<ContactEntity> contactEntityOptional = contactRepository.findById(id);
-//        if (contactEntityOptional.isEmpty()) {
-//            throw new RessourceNotFoundException("Contact does not exist");
-//        }
-        return contactEntityOptional.map(contactMapper::toDto);
+
+        return contactMapper.toDto(contactEntityOptional.orElseThrow(() -> new RessourceNotFoundException("Contact does not exist 2222")));
     }
 }

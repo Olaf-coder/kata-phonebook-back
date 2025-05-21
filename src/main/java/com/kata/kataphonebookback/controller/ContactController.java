@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/v1.0/contacts")
@@ -50,8 +48,8 @@ public class ContactController {
             @ApiResponse(responseCode = "404", description = "Echec de la récuperation, la ressource n'existe pas", content = @Content )
     })
     public ResponseEntity<ContactDto> getContact(@Schema(description = "id du contact") @PathVariable Long contactId) {
-        Optional<ContactDto> contactOpt = contactService.getContactById(contactId);
-        return contactOpt.map(contact -> new ResponseEntity<>(contact, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        ContactDto contact = contactService.getContactById(contactId);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
 
     }
 
@@ -63,14 +61,8 @@ public class ContactController {
                     )}),
             @ApiResponse(responseCode = "404", description = "Echec de la création, la ressource n'existe pas", content = @Content )
     })
-    //TODO Ajouter le reste des annotations.
     public ResponseEntity<ContactDto> createContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a ajouter") @RequestBody ContactDto contact) {
-        //TODO ControllerAdvice, retirer le try catch
-        try {
-            return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
-        } catch (InvalidDataException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(contactService.addNewContact(contact), HttpStatus.CREATED);
     }
 
 
@@ -88,8 +80,14 @@ public class ContactController {
 
     @PutMapping("/{contactId}")
     @Operation(summary="Mise à jour d'un contact précis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contact mis à jour",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ContactDto.class)
+                    )}),
+            @ApiResponse(responseCode = "404", description = "Echec de la mise à jour, la ressource n'existe pas", content = @Content ),
+            @ApiResponse(responseCode = "400", description = "Echec de la mise à jour, une des information obligatoire est manquante", content = @Content )
+    })
     public ResponseEntity<ContactDto> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody ContactDto contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
-        //TODO ControllerAdvice, retirer le try catch
         try {
             return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
         } catch (RessourceNotFoundException e) {
