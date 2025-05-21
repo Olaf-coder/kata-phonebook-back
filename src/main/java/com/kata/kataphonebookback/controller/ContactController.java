@@ -88,13 +88,7 @@ public class ContactController {
             @ApiResponse(responseCode = "400", description = "Echec de la mise à jour, une des information obligatoire est manquante", content = @Content )
     })
     public ResponseEntity<ContactDto> updateContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "contact a mettre à jour") @RequestBody ContactDto contact, @Schema(description = "id du contact") @PathVariable Long contactId) {
-        try {
-            return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
-        } catch (RessourceNotFoundException e) {
-            return new ResponseEntity<> (HttpStatus.NOT_FOUND);
-        } catch (InvalidDataException e) {
-            return new ResponseEntity<> (HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(contactService.updateContact(contactId, contact), HttpStatus.OK);
     }
 
 }

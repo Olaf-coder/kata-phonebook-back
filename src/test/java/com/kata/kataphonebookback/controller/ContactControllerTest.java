@@ -1,21 +1,24 @@
 package com.kata.kataphonebookback.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kata.kataphonebookback.advice.GlobalControllerAdvice;
 import com.kata.kataphonebookback.exceptions.InvalidDataException;
 import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 import com.kata.kataphonebookback.service.ContactService;
 import com.kata.kataphonebookback.service.ContactServiceImpl;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
-import java.util.Optional;
 
 
 import static org.hamcrest.Matchers.*;
@@ -24,17 +27,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+@WebMvcTest(controllers = ContactController.class)
+@Import(GlobalControllerAdvice.class)
 class ContactControllerTest {
 
     private static final String ENDPOINT = "/v1.0/contacts";
+
+    @MockitoBean
     private final ContactService contactService = Mockito.mock(ContactServiceImpl.class);
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ContactController(contactService)).build();
-    }
+    // Equivalant a l'annotation @WebMvc et @Import:
+//    @BeforeEach
+//    void setUp() {
+//        mockMvc = MockMvcBuilders
+//          .standaloneSetup(new ContactController(contactService))
+//          .setControllerAdvice(new GlobalControllerAdvice())
+//          .build();
+//    }
 
     @AfterEach
     void tearDown() {
@@ -88,12 +100,14 @@ class ContactControllerTest {
     void should_call_getContactById_and_return_404_and_Contact_when_GET_contacts_with_id_is_called() throws Exception {
         //GIVEN
         Long contactIdUnknown = 50L;
-        Mockito.when(contactService.getContactById(contactIdUnknown)).thenThrow(new RessourceNotFoundException("Contact not found"));
+        String message = "Contact not found";
+        Mockito.when(contactService.getContactById(contactIdUnknown)).thenThrow(new RessourceNotFoundException(message));
 
         //WHEN THEN
         mockMvc.perform(get(ENDPOINT +"/" + contactIdUnknown))
                 .andExpect(status().isNotFound())
-                .andReturn();
+                .andExpect(jsonPath("$.message", is(message)))
+                .andExpect(jsonPath("$.code", is(HttpStatus.NOT_FOUND.value())));
     }
 
     @Test
@@ -103,40 +117,30 @@ class ContactControllerTest {
         ContactDto contactSaved = new ContactDto(1L, "John", "Smith", null, null);
         Mockito.when(contactService.addNewContact(contactInput)).thenReturn(contactSaved);
 
-        String contactJson = """
-        {
-            "firstName": "John",
-            "familyName": "Smith"
-        }
-        """;
-
         //WHEN THEN
-        mockMvc.perform(post(ENDPOINT + "/").contentType(MediaType.APPLICATION_JSON).content(contactJson))
+        mockMvc.perform(post(ENDPOINT + "/").contentType(MediaType.APPLICATION_JSON).content(new ObjectMapper().writeValueAsString(contactInput)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.firstName", is("John")))
-                .andExpect(jsonPath("$.familyName", is("Smith")))
-                .andExpect(jsonPath("$.phoneNumber", is(nullValue())))
-                .andExpect(jsonPath("$.email", is(nullValue())))
+                .andExpect(jsonPath("$.id", is(contactSaved.id().intValue())))
+                .andExpect(jsonPath("$.firstName", is(contactSaved.firstName())))
+                .andExpect(jsonPath("$.familyName", is(contactSaved.familyName())))
+                .andExpect(jsonPath("$.phoneNumber", is(contactSaved.phoneNumber())))
+                .andExpect(jsonPath("$.email", is(contactSaved.email())))
                 .andReturn();
     }
 
     @Test
     void should_call_addNewContact_and_return_400_when_POST_contacts_with_bad_Contact_requestbody_is_called() throws Exception {
         //GIVEN
+        String message = "Bad Datas";
         ContactDto contactBad = new ContactDto(null, "John", null, null, null);
-        Mockito.when(contactService.addNewContact(contactBad)).thenThrow(new InvalidDataException("bad datas"));
-
-        String contactJson = """
-        {
-            "firstName": "John"
-        }
-        """;
+        Mockito.when(contactService.addNewContact(contactBad)).thenThrow(new InvalidDataException(message));
 
         //WHEN THEN
-        mockMvc.perform(post(ENDPOINT + "/").contentType(MediaType.APPLICATION_JSON).content(contactJson))
+        mockMvc.perform(post(ENDPOINT + "/").content(new ObjectMapper().writeValueAsString(contactBad)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(message)))
+                .andExpect(jsonPath("$.code", is(HttpStatus.BAD_REQUEST.value())))
                 .andReturn();
     }
 
@@ -165,15 +169,17 @@ class ContactControllerTest {
     void should_call_updateContact_and_return_400_when_PUT_contacts_with_bad_Contact_requestbody_is_called() throws Exception {
         //GIVEN
         Long contactId = 1L;
+        String message = "Bad Datas";
         ContactDto contactToUpdate = new ContactDto(1L, "Steven", null, "0123456789", "mine@mail.com");
-
-        Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new InvalidDataException("bad datas"));
+        Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new InvalidDataException(message));
 
 
         //WHEN THEN
         mockMvc.perform(put(ENDPOINT + "/" + contactId).content(new ObjectMapper().writeValueAsString(contactToUpdate)).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is(message)))
+                .andExpect(jsonPath("$.code", is(HttpStatus.BAD_REQUEST.value())))
                 .andReturn();
     }
 
@@ -181,15 +187,18 @@ class ContactControllerTest {
     void should_call_updateContact_and_return_404_when_PUT_contacts_with_id_in_url_not_found_is_called() throws Exception {
         //GIVEN
         Long contactId = 1L;
+        String message = "Contact not found";
         ContactDto contactToUpdate = new ContactDto(1L, "Steven", null, "0123456789", "mine@mail.com");
 
-        Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new RessourceNotFoundException("Contact does not exist"));
+        Mockito.when(contactService.updateContact(1L, contactToUpdate)).thenThrow(new RessourceNotFoundException(message));
 
 
         //WHEN THEN
         mockMvc.perform(put(ENDPOINT + "/" + contactId).content(new ObjectMapper().writeValueAsString(contactToUpdate)).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(message)))
+                .andExpect(jsonPath("$.code", is(HttpStatus.NOT_FOUND.value())))
                 .andReturn();
     }
 
@@ -200,7 +209,9 @@ class ContactControllerTest {
         Mockito.doNothing().when(contactService).deleteContact(id);
 
         //WHEN THEN
-        mockMvc.perform(delete(ENDPOINT +"/"+id)).andExpect(status().isNoContent()).andReturn();
+        mockMvc.perform(delete(ENDPOINT +"/"+id))
+                .andExpect(status().isNoContent())
+                .andReturn();
 
     }
 }
