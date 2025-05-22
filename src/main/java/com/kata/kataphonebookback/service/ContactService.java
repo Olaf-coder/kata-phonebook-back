@@ -3,7 +3,6 @@ package com.kata.kataphonebookback.service;
 import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ContactService {
     ContactDto addNewContact(ContactDto contact);

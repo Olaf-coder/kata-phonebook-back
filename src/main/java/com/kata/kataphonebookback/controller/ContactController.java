@@ -1,7 +1,5 @@
 package com.kata.kataphonebookback.controller;
 
-import com.kata.kataphonebookback.exceptions.InvalidDataException;
-import com.kata.kataphonebookback.exceptions.RessourceNotFoundException;
 import com.kata.kataphonebookback.domain.model.dto.ContactDto;
 import com.kata.kataphonebookback.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +36,6 @@ public class ContactController {
         return new ResponseEntity<>(contactService.getAllContacts(), HttpStatus.OK);
     }
 
-    //TODO delete orElseGet , service return Value Directly
     @GetMapping("/{contactId}")
     @Operation(summary = "Recuperation d'un contact précis")
     @ApiResponses(value = {

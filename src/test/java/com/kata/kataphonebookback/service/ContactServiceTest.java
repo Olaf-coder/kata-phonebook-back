@@ -220,7 +220,6 @@ class ContactServiceTest {
     }
 
 //READ
-    //TODO return not an Optional but value directly
     @Test
     void should_call_getReferenceById_once_and_return_existing_contact_when_getContactById_is_called_with_correct_id() {
         //GIVEN
@@ -243,7 +242,6 @@ class ContactServiceTest {
         assertThat(actualContact).isEqualTo(expectedDto);
     }
 
-    //TODO and raise RessourceNotFoundException.
     @Test
     void should_call_getReferenceById_once_and_raise_RessourceNotFoundException_when_getContactById_is_called_with_non_existing_id() {
         //GIVEN
@@ -279,11 +277,9 @@ class ContactServiceTest {
         assertThat(actualDtos).isEqualTo(expectedDtos);
     }
 
-    //TODO Ajouter la remontée d'exceptions
     @Test
     void should_call_findAll_once_and_return_RessourceNotFoundException_contact_when_getAllContacts_is_called_and_Contacts_are_not_Registered() {
         //GIVEN
-        List<ContactDto> expectedDtos = createExpectedContactDtos();
         List<ContactEntity> existingEntities = new ArrayList<>();
 
         when(contactRepository.findAll()).thenReturn(existingEntities);
