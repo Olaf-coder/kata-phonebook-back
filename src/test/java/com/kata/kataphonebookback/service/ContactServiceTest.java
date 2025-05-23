@@ -10,12 +10,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -89,13 +93,11 @@ class ContactServiceTest {
 
     }
 
-    @Test
-    void should_not_call_save_and_throw_InvalidDataException_when_addNewContact_is_called_with_not_all_mandatory_datas() {
-        //GIVEN
-        ContactDto inputDto = new ContactDto(null, "John", null, null, null);
-
+    @ParameterizedTest
+    @MethodSource("contactProviderIncorrectForAddContact")
+    void parameterized_should_not_call_save_and_throw_InvalidDataException_when_addNewContact_is_called_with_not_all_mandatory_datas(ContactDto inputWrongDto) {
         //WHEN THEN
-        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.addNewContact(inputDto));
+        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.addNewContact(inputWrongDto));
         verify(contactRepository, never()).save(any(ContactEntity.class));
 
     }
@@ -166,39 +168,20 @@ class ContactServiceTest {
         verify(contactRepository, never()).save(any(ContactEntity.class));
     }
 
-    @Test
-    void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_no_firstName() {
+    @ParameterizedTest
+    @MethodSource("contactProviderIncorrectForAddContact")
+    void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_familyName_Blank(ContactDto dtoContactIncorrect) {
         //GIVEN
         Long contactId = 1L;
 
-        ContactDto dtoUnknownFirstName = new ContactDto(1L, null, "Smith", "0102030405", "mail@mail.com");
-
-        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
+        ContactEntity existingEntity = createContactEntity(contactId,"John", "Smith", "john.smith@gmail.com", "0102030405");
 
         when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
-        when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoUnknownFirstName);
+        when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoContactIncorrect);
 
 
         //WHEN THEN
-        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, dtoUnknownFirstName));
-        verify(contactRepository, never()).save(any(ContactEntity.class));
-    }
-
-    @Test
-    void should_throw_InvalidDataException_when_updateContact_is_called_with_contact_and_familyName_Blank() {
-        //GIVEN
-        Long contactId = 1L;
-
-        ContactDto dtoUnknownFamilyName = new ContactDto(1L, "John", "   ", "0102030405", "mail@mail.com");
-
-        ContactEntity existingEntity = createContactEntity(1L,"John", "Smith", "john.smith@gmail.com", "0102030405");
-
-        when(contactRepository.findById(contactId)).thenReturn(Optional.of(existingEntity));
-        when(contactMapper.toDto(any(ContactEntity.class))).thenReturn(dtoUnknownFamilyName);
-
-
-        //WHEN THEN
-        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, dtoUnknownFamilyName));
+        assertThatExceptionOfType(InvalidDataException.class).isThrownBy(() -> contactService.updateContact(contactId, dtoContactIncorrect));
         verify(contactRepository, never()).save(any(ContactEntity.class));
     }
 
@@ -288,6 +271,17 @@ class ContactServiceTest {
         assertThatExceptionOfType(RessourceNotFoundException.class).isThrownBy(() -> contactService.getAllContacts());
         verify(contactRepository, times(1)).findAll();
         verify(contactMapper, never()).toDto(any(ContactEntity.class));
+    }
+
+    private static Stream<Arguments> contactProviderIncorrectForAddContact() {
+        return Stream.of(
+                Arguments.of(new ContactDto(0L, null, "familyName", "0102030405", "email@mail.com")),
+                Arguments.of(new ContactDto(0L, "", "familyName", "0102030405", "email@mail.com")),
+                Arguments.of(new ContactDto(0L, " ", "familyName", "0102030405", "email@mail.com")),
+                Arguments.of(new ContactDto(0L, "firstName", null, "0102030405", "email@mail.com")),
+                Arguments.of(new ContactDto(0L, "firstName", "", "0102030405", "email@mail.com")),
+                Arguments.of(new ContactDto(0L, "firstName", " ", "0102030405", "email@mail.com"))
+        );
     }
 
     private List<ContactEntity> createExistingContactEntities()

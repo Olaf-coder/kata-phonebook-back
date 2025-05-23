@@ -22,6 +22,8 @@ import java.util.List;
 
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -212,6 +214,7 @@ class ContactControllerTest {
         mockMvc.perform(delete(ENDPOINT +"/"+id))
                 .andExpect(status().isNoContent())
                 .andReturn();
+        verify(contactService, times(1)).deleteContact(id);
 
     }
 }

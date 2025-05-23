@@ -21,12 +21,4 @@ public class ApiError {
     public String getMessage() {
         return message;
     }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
 }
